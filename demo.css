@@ -1,0 +1,15 @@
+body {
+  background-color: #B8B8AF;
+  font-family: Helvetica;
+}
+#container {
+  width: 580px;
+  margin: 0 auto;
+}
+
+.example {
+  padding: 20px;
+  background: #f1f1f1;
+  margin-bottom: 20px;
+}
+

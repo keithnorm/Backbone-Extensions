@@ -1,70 +1,169 @@
 <html>
 <head>
 	<title></title>
+  <link rel='stylesheet' href='demo.css' type='text/css'>
+  <script type='text/javascript' src='lib/jquery.js'></script>
+  <script type='text/javascript' src='lib/underscore.js'></script>
+  <script type='text/javascript' src='lib/backbone.js'></script>
+  <script type="text/javascript" src="src/backbone_query_parser.js"></script>
+  <script type="text/javascript" src="src/backbone_routes.js"></script>
+  <script type="text/javascript" src="src/backbone_memory_store.js"></script>
+  <script type="text/javascript" src="lib/mustache.js"></script>
+
+  <script type='text/javascript'>
+  var App = {
+    Controllers: {},
+    Models: {},
+    Collections: {},
+    Views: {}
+  };
+
+  var Post = Backbone.Model.extend({
+    url: function() {
+      return App.Collections.Posts.prototype.url;
+    },
+
+    initialize: function() {
+      for(var attr in this.attributes) {
+        this[attr] = this.attributes[attr];
+      }
+    },
+
+    parse: function(response) {
+      var post, self = this;
+      _.each(response.models, function(model, i) {
+        if(new Post(model.attributes).permalink() == self.permalink)
+          post = model;
+      });
+      return post.attributes;
+    },
+
+    fetch: function(options) {
+      var self = this;
+      var collection = new App.Collections.Posts();
+      collection.fetch({
+        success: function(response) {
+          self.attributes = self.parse(response);
+          self.initialize();
+          options.success();
+        }
+      });
+    },
+    
+    permalink: function() {
+      return this.get('title').replace(/[^\w]/gi, '-')
+    }
+  });
+
+  App.Collections.Posts = Backbone.Collection.extend({
+    url: "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20rss%20where%20url%3D'http%3A%2F%2Fkeithnorm.com%2Ffeed%2F'%3B&format=json&diagnostics=true&callback=?",
+    model: Post,
+
+    parse: function(response) {
+      return response.query.results.item;
+    }
+  });
+
+  App.Controllers.Demo = Backbone.Controller.extend({
+    routes: {
+      ''                 : {to: 'index', as: 'posts'},
+      '/posts'           : {to: 'index', as: 'posts'},
+      '/posts/:permalink': {to: 'show', as: 'post'}
+    },
+
+    initialize: function() {
+    },
+
+    index: function() {
+      console.log('rendered posts path', this.postsPath());
+      var posts = new App.Collections.Posts();
+      posts.fetch({
+        success: function() {
+          new App.Views.Posts({
+            collection: posts
+          });
+        }
+      });
+    },
+    
+    show: function(params) {
+      var post = new Post({permalink: params.permalink});
+      post.fetch({
+        success: function() {
+          new App.Views.Post({model: post});
+        }
+      });
+    }
+  });
+
+  App.Views.Posts = Backbone.View.extend({
+
+    el: '#posts',
+
+    events: {},
+
+    template: '{{# posts }}<div class="example">\
+        <h2><a href="#{{ href }}">{{ title }}</a></h2>\
+      </div>\
+      {{/ posts }}',
+
+    initialize: function() {
+      console.log('init view', this);
+      this.render();
+    },
+
+    render: function() {
+      var models = _.map(this.collection.models, _.bind(function(model, i) {
+        return this._wrapViewMethods(model);
+      }, this));
+      $(this.el).html(Mustache.to_html(this.template, {posts: models}));
+    },
+
+    _wrapViewMethods: function(model) {
+      model.href = this.postPath(model.permalink());
+      return model;
+    }
+
+  });
+
+  App.Views.Post = Backbone.View.extend({
+    el: '#posts',
+
+    events: {},
+
+    template: '<div class="example">\
+        <h2><a href="#{{ href }}">{{ title }}</a></h2>\
+        {{{ encoded }}}\
+      </div>',
+
+    initialize: function() {
+      this.render();
+    },
+
+    render: function() {
+      $(this.el).html(Mustache.to_html(this.template, this._wrapViewMethods(this.model)));
+    },
+
+    _wrapViewMethods: function(model) {
+      model.href = this.postPath(model.permalink);
+      return model;
+    }
+  });
+
+  $(function() {
+    new App.Controllers.Demo();
+    Backbone.history.start();
+  });
+  </script>
 </head>
-<script type='text/javascript' src='lib/jquery.js'></script>
-<script type='text/javascript' src='lib/underscore.js'></script>
-<script type='text/javascript' src='lib/backbone.js'></script>
-<script type='text/javascript'>
-var App = {
-  Controllers: {},
-  Models: {},
-  Views: {}
-};
-
-App.Controllers.Demo = Backbone.Controller.extend({
-  routes: {
-    'posts'     : {'post'  : 'create', //postsPath({method: 'post'})
-                   'get'   : 'index'}, //postsPath()
-
-    'posts/:id' : {'get'   : 'show', //postsPath(1)
-                   'put'   : 'update', //postsPath(1, {method: 'post'})
-                   'delete': 'destroy'}, //postsPath(1, {method: 'delete'})
-
-    'posts'     : 'resources', 
-    'something' : {to: 'something', as: 'whatever'} //whateverPath()
-  },
-
-  initialize: function() {
-    console.log('init');
-  },
-
-  index: function(req, res) {
-    console.log('whatever', this.indexPath());
-    //new App.Views.WhateverView();
-    //res.render('whatever');
-  },
-
-  show: function(req, res) {
-    console.log('show path', this.showPath());
-  }
-});
-
-App.Views.WhateverView = Backbone.View.extend({
-
-  el: 'body',
-
-  events: {
-    'click a': 'goToWhatever'
-  },
-
-  initialize: function() {
-    console.log('init view');
-  },
-
-  goToWhatever: function() {
-    console.log('goToWhatever', arguments);
-    //resp.redirectTo(whateverPath());
-  }
-});
-
-$(function() {
-  new App.Controllers.Demo();
-  Backbone.history.start();
-});
-</script>
 <body>
-  <a href='#whatever'>Whatever</a>
+  <div id='container'>
+    <h1>
+      <a href='#posts'>Backbone Routes Demo</a>
+    </h1>
+    <div id='posts'>
+    </div>
+  </div>
 </body>
 </html>
 

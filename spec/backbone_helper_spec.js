@@ -1,3 +1,0 @@
-describe('Backbone.router', function() {
-
-});
