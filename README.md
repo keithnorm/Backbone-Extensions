@@ -10,7 +10,7 @@ Just include the backbone_memory_store.js file and you're good to go
 ## Backbone Query Parser
 This does 2 things:
 
-1. It augments Backbone.Controller._routeToRegExp to allow your regular routes to match routes with query parameters. So say you have this:
+It augments Backbone.Controller._routeToRegExp to allow your regular routes to match routes with query parameters. So say you have this:
 
       App.Controllers.ApplicationController = Backbone.Controllers.extend({
         routes: {
@@ -20,7 +20,7 @@ This does 2 things:
 
 Typically that would match routes like myblog.com/#posts, however it woulnd NOT match routes like myblog.com/#posts?order=popularity. With the query parser it will. 
 
-2. It overrides Backbone.Controller._extractParameters to parse named params and query params into a params object.
+It overrides Backbone.Controller._extractParameters to parse named params and query params into a params object.
   
       App.Controllers.ApplicationController = Backbone.Controllers.extend({
         routes: {
