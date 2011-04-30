@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title></title>
+</head>
+<script type='text/javascript' src='lib/jquery.js'></script>
+<script type='text/javascript' src='lib/underscore.js'></script>
+<script type='text/javascript' src='lib/backbone.js'></script>
+<script type='text/javascript'>
+var App = {
+  Controllers: {},
+  Models: {},
+  Views: {}
+};
+
+App.Controllers.Demo = Backbone.Controller.extend({
+  routes: {
+    'posts'     : {'post'  : 'create', //postsPath({method: 'post'})
+                   'get'   : 'index'}, //postsPath()
+
+    'posts/:id' : {'get'   : 'show', //postsPath(1)
+                   'put'   : 'update', //postsPath(1, {method: 'post'})
+                   'delete': 'destroy'}, //postsPath(1, {method: 'delete'})
+
+    'posts'     : 'resources', 
+    'something' : {to: 'something', as: 'whatever'} //whateverPath()
+  },
+
+  initialize: function() {
+    console.log('init');
+  },
+
+  index: function(req, res) {
+    console.log('whatever', this.indexPath());
+    //new App.Views.WhateverView();
+    //res.render('whatever');
+  },
+
+  show: function(req, res) {
+    console.log('show path', this.showPath());
+  }
+});
+
+App.Views.WhateverView = Backbone.View.extend({
+
+  el: 'body',
+
+  events: {
+    'click a': 'goToWhatever'
+  },
+
+  initialize: function() {
+    console.log('init view');
+  },
+
+  goToWhatever: function() {
+    console.log('goToWhatever', arguments);
+    //resp.redirectTo(whateverPath());
+  }
+});
+
+$(function() {
+  new App.Controllers.Demo();
+  Backbone.history.start();
+});
+</script>
+<body>
+  <a href='#whatever'>Whatever</a>
+</body>
+</html>
+
