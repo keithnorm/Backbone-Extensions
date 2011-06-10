@@ -13,19 +13,35 @@ describe("Backbone Extensions", function() {
       });
     });
 
-    it('calls original sync on cache miss', function() {
+    it('when reading, calls original sync on cache miss', function() {
       Backbone._cache = {};
       Backbone.sync('read', post, {success: function() {}});
       expect($.ajax).wasCalled();
     });
 
-    it('does not call original sync on cache hit', function() {
+    it('when reading, does not call original sync on cache hit', function() {
       Backbone._cache = {
         '/posts/123' : {title: 'My Awesome Post'}
       };
       Backbone.sync('read', post, {success: function() {}});
       expect($.ajax).wasNotCalled();
     });
+
+    it('when creating, calls original sync', function() {
+      Backbone.sync('create', post, {success: function() {}});
+      expect($.ajax).wasCalled();
+    });
+
+    it('when updating, calls original sync', function() {
+      Backbone.sync('update', post, {success: function() {}});
+      expect($.ajax).wasCalled();
+    });
+
+    it('when deleting, calls original sync', function() {
+      Backbone.sync('delete', post, {success: function() {}});
+      expect($.ajax).wasCalled();
+    });
+
   });
 });
 

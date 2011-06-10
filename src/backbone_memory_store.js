@@ -16,7 +16,8 @@ Backbone.sync = (function(original) {
 
         return original.call(this, method, model, options);
       }
+    } else {
+      return original.call(this, method, model, options);
     }
   };
 })(Backbone.sync);
-
