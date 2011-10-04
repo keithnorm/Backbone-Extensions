@@ -1,7 +1,7 @@
 describe('Backbone.router', function() {
   beforeEach(function() {
     App = {
-      Controllers: {}
+      Routers: {}
     };
 
     stupidTestBooleans = ['calledSomethingElse', 'calledIndex', 'calledShow', 'calledCreate', 'calledUpdate', 'calledDestroy'];
@@ -10,7 +10,7 @@ describe('Backbone.router', function() {
       window[bool] = false;
     });
 
-    App.Controllers.Posts = Backbone.Controller.extend({
+    App.Routers.Posts = Backbone.Router.extend({
       routes: {
         //'posts'     : {'post'  : 'create',  //postsPath()
         //               'get'   : 'index'},  //postsPath()
@@ -34,7 +34,7 @@ describe('Backbone.router', function() {
         calledIndex = true;
       }
     });
-    controller = new App.Controllers.Posts();
+    router = new App.Routers.Posts();
   });
 
   afterEach(function() {
@@ -45,40 +45,40 @@ describe('Backbone.router', function() {
 
   describe('route generation', function() {
     it('handles basic routes', function() {
-      expect(controller.commentsPath()).toEqual('comments');
+      expect(router.commentsPath()).toEqual('comments');
     });
 
     it('handles named routes', function() {
-      expect(controller.whateverPath()).toEqual('something');
+      expect(router.whateverPath()).toEqual('something');
     });
 
     it('handles routes with named params', function() {
-      expect(controller.tasksPath(1)).toEqual('tasks/1');
+      expect(router.tasksPath(1)).toEqual('tasks/1');
     });
 
     it('handles routes with named params and extra query params', function() {
-      expect(controller.tasksPath(1, {filter: 'date'})).toEqual('tasks/1?filter=date');
+      expect(router.tasksPath(1, {filter: 'date'})).toEqual('tasks/1?filter=date');
     });
 
     describe('resources', function() {
       xit('handles index', function() {
-        expect(controller.postsPath()).toEqual('/posts');
+        expect(router.postsPath()).toEqual('/posts');
       });
 
       xit('handles show', function() {
-        expect(controller.postPath(1)).toEqual('/posts/1');
+        expect(router.postPath(1)).toEqual('/posts/1');
       });
 
       xit('handles update', function() {
-        expect(controller.postPath(1)).toEqual('/posts/1');
+        expect(router.postPath(1)).toEqual('/posts/1');
       });
 
       xit('handles create', function() {
-        expect(controller.postsPath()).toEqual('/posts');
+        expect(router.postsPath()).toEqual('/posts');
       });
 
       xit('handles delete', function() {
-        expect(controller.postPath(1)).toEqual('/posts/1');
+        expect(router.postPath(1)).toEqual('/posts/1');
       });
     });
   });

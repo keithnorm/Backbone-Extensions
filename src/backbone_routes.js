@@ -1,4 +1,4 @@
-Backbone.Controller.prototype._composeParameters = function (route) {
+Backbone.Router.prototype._composeParameters = function (route) {
   var args = _.toArray(arguments).slice(1);
   _.each(route.match(/:[^\/]+/gi), function(match, i) {
     route = route.replace(match, args.shift());
@@ -6,7 +6,7 @@ Backbone.Controller.prototype._composeParameters = function (route) {
   return _.isEmpty(args) ? route : route + '?' + $.param(args.shift());
 };
 
-Backbone.Controller.prototype._bindRoutes = (function(original) {
+Backbone.Router.prototype._bindRoutes = (function(original) {
   return function() {
     var routes = [], routeGenerators = {};
     for(var route in this.routes) {
@@ -29,14 +29,14 @@ Backbone.Controller.prototype._bindRoutes = (function(original) {
       routeGenerators[name + 'Path'] = function() {
         var args = _.toArray(arguments);
         args.unshift(path);
-        return Backbone.Controller.prototype._composeParameters.apply(this, args);
+        return Backbone.Router.prototype._composeParameters.apply(this, args);
       };
 
       delete this.routes[path];
       this.routes[path] = callback;
     }.bind(this));
 
-    _.each([Backbone.Controller.prototype, Backbone.Model.prototype, Backbone.View.prototype],
+    _.each([Backbone.Router.prototype, Backbone.Model.prototype, Backbone.View.prototype],
       function(obj, i) {
         _.extend(obj, routeGenerators);
       }
@@ -44,5 +44,5 @@ Backbone.Controller.prototype._bindRoutes = (function(original) {
     
     original.call(this);
   };
-})(Backbone.Controller.prototype._bindRoutes);
+})(Backbone.Router.prototype._bindRoutes);
 

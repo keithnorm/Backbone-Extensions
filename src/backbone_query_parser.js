@@ -6,7 +6,7 @@ Backbone.History.prototype.route = function(route, callback) {
 };
 
 //this makes router match urls with ?foo=bar params
-Backbone.Controller.prototype._routeToRegExp = function (d) {
+Backbone.Router.prototype._routeToRegExp = function (d) {
   var e = d.route ? d.route : d;
   var a = /:([\w\d]+)/g;
   d = d.params !== undefined ? d.params : true;
@@ -20,7 +20,7 @@ Backbone.Controller.prototype._routeToRegExp = function (d) {
   return RegExp("^" + f + "$");
 };
 
-Backbone.Controller.prototype._extractParameters = function (route, path) {
+Backbone.Router.prototype._extractParameters = function (route, path) {
   var query = path.indexOf("?"), queryParams = {}, rint = /^\d+$/;
   if (query > -1) {
     var params = path.substr(query + 1).split("&");
