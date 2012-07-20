@@ -43,7 +43,7 @@ Backbone.Router.prototype._extractParameters = function (route, path) {
     path = path.substr(0, query);
     _.each(params, function(param) {
       param = param.split("=");
-      queryParams[param[0]] = param[1];
+      queryParams[param[0]] = decodeURIComponent(param[1].replace(/\+/g,"%20"));
     });
   }
 
